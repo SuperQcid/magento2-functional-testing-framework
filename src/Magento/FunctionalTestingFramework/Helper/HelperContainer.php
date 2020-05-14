@@ -11,7 +11,7 @@ use Magento\FunctionalTestingFramework\Exceptions\TestFrameworkException;
 /**
  * Class HelperContainer
  */
-class HelperContainer
+class HelperContainer extends \Codeception\Module
 {
     /**
      * @var Helper[]
@@ -19,12 +19,19 @@ class HelperContainer
     private $helpers = [];
 
     /**
-     * HelperContainer constructor.
-     * @param array $helpers
+     * Set helper to container.
+     *
+     * @param string $helperClass
+     * @throws \Exception
      */
-    public function __construct(array $helpers = [])
+    public function set(string $helperClass)
     {
-        $this->helpers = $helpers;
+        if (get_parent_class($helperClass) !== Helper::class) {
+            throw new \Exception("Helper class must extend " . Helper::class);
+        }
+        if (!isset($this->helpers[$helperClass])) {
+            $this->helpers[$helperClass] = $this->moduleContainer->create($helperClass);
+        }
     }
 
     /**
